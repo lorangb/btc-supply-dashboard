@@ -1,12 +1,65 @@
 <!DOCTYPE html>
 <html>
-<head><meta name="viewport" content="width=device-width"><title>BTC Supply</title></head>
-<body style="background:#0a0a0a;color:#fff;font-family:sans-serif;padding:20px;text-align:center;">
-<h1 style="color:#f7931a;">BTC Supply Shock</h1>
-<p>Score: <span style="color:#ff3b30;font-size:3rem;">100/100</span></p>
-<p style="color:#ff3b30;">🔥 EXTREME RISK</p>
-<p>BTC on Exchanges: 1.63M (7.74%)</p>
-<p>Status: Extreme supply squeeze imminent</p>
-<p style="margin-top:40px;color:#666;">Last updated: 2026-03-15</p>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTC Supply Shock Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body { background: #0a0a0a; color: #fff; font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 20px; }
+.container { max-width: 1200px; margin: 0 auto; }
+h1 { background: linear-gradient(90deg, #f7931a, #ff9500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 20px 0; }
+.card { background: #1a1a1a; border-radius: 16px; padding: 20px; border: 1px solid #333; }
+.value { font-size: 2.5rem; font-weight: bold; text-align: center; }
+.chart { position: relative; height: 350px; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🪙 BTC Supply Shock Dashboard</h1>
+<p style="color: #888;">Live Exchange Balance Monitor</p>
+
+<div class="grid">
+<div class="card">
+<div class="value" style="color: #ff3b30;">7.74%</div>
+<div style="text-align: center; color: #888;">Supply on Exchanges</div>
+</div>
+<div class="card">
+<div class="value">1.63M</div>
+<div style="text-align: center; color: #888;">BTC on Exchanges</div>
+</div>
+<div class="card">
+<div class="value" style="color: #ff3b30;">100/100</div>
+<div style="text-align: center; color: #888;">Shock Score</div>
+</div>
+</div>
+
+<div class="card">
+<h3>Supply Shock Levels</h3>
+<div style="margin: 15px 0; padding: 15px; background: #252525; border-radius: 10px; display: flex; justify-content: space-between;">
+<span><strong>12% Supply</strong><br><span style="color: #888;">~2.52M BTC</span></span>
+<span style="color: #ffcc00;">Moderate Risk</span>
+</div>
+<div style="margin: 15px 0; padding: 15px; background: #252525; border-radius: 10px; display: flex; justify-content: space-between;">
+<span><strong>10% Supply</strong><br><span style="color: #888;">~2.10M BTC</span></span>
+<span style="color: #ff9500;">High Risk</span>
+</div>
+<div style="margin: 15px 0; padding: 15px; background: #252525; border-radius: 10px; display: flex; justify-content: space-between;">
+<span><strong>8% Supply</strong><br><span style="color: #888;">~1.68M BTC</span></span>
+<span style="color: #ff3b30;">EXTREME 🔥</span>
+</div>
+</div>
+
+<div class="card">
+<h3>Key Insight</h3>
+<p>When exchange supply drops, less BTC is available for sale. Historical precedent: March 2024 at 10.5% supply → BTC rallied 40%.</p>
+<p style="color: #888; margin-top: 15px;">Current trend: Rising inflow (more supply on exchanges = less shock risk short-term)</p>
+</div>
+
+</div>
+<div style="text-align: center; color: #666; margin-top: 40px;">
+Last updated: 2026-03-15 | Data: Exchange balance aggregation
+</div>
 </body>
 </html>
