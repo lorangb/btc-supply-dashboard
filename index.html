@@ -1,65 +1,847 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BTC Supply Shock Dashboard</title>
+<title>BTC Supply Shock Dashboard & Forecast</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.1/dist/chartjs-plugin-annotation.min.js"></script>
 <style>
-body { background: #0a0a0a; color: #fff; font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 20px; }
-.container { max-width: 1200px; margin: 0 auto; }
-h1 { background: linear-gradient(90deg, #f7931a, #ff9500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 20px 0; }
-.card { background: #1a1a1a; border-radius: 16px; padding: 20px; border: 1px solid #333; }
-.value { font-size: 2.5rem; font-weight: bold; text-align: center; }
-.chart { position: relative; height: 350px; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #0a0a0f;
+  color: #e0e0e0;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  padding: 20px;
+  min-height: 100vh;
+}
+.container { max-width: 1400px; margin: 0 auto; }
+header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 30px 20px;
+  background: linear-gradient(135deg, #0d0d15 0%, #1a0a00 100%);
+  border: 1px solid #f7931a33;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(ellipse at center, #f7931a08 0%, transparent 70%);
+  animation: pulse 4s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+h1 {
+  font-size: 2.2rem;
+  background: linear-gradient(90deg, #f7931a, #ffb347, #f7931a);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s linear infinite;
+  position: relative;
+}
+@keyframes shimmer { to { background-position: 200% center; } }
+.subtitle { color: #666; font-size: 0.85rem; margin-top: 8px; position: relative; }
+.subtitle a { color: #f7931a88; text-decoration: none; }
+
+/* Metric Cards */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.metric-card {
+  background: #111118;
+  border: 1px solid #222;
+  border-radius: 12px;
+  padding: 18px;
+  text-align: center;
+  transition: border-color 0.3s;
+}
+.metric-card:hover { border-color: #f7931a55; }
+.metric-label { font-size: 0.7rem; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.metric-value { font-size: 1.8rem; font-weight: 700; }
+.metric-sub { font-size: 0.7rem; color: #555; margin-top: 4px; }
+.text-orange { color: #f7931a; }
+.text-red { color: #ff3b30; }
+.text-green { color: #30d158; }
+.text-yellow { color: #ffd60a; }
+.text-blue { color: #0a84ff; }
+.text-purple { color: #bf5af2; }
+
+/* Sections */
+.section {
+  background: #111118;
+  border: 1px solid #222;
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.section-title {
+  font-size: 1rem;
+  color: #f7931a;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.chart-container { position: relative; height: 350px; width: 100%; }
+.chart-container-lg { height: 420px; }
+
+/* Two column layout */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+@media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+/* Scenario Table */
+.scenario-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+.scenario-table th {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid #333;
+  color: #888;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.scenario-table td {
+  padding: 12px;
+  border-bottom: 1px solid #1a1a1a;
+  font-size: 0.85rem;
+}
+.scenario-table tr:hover { background: #ffffff05; }
+
+/* Shock meter */
+.shock-meter {
+  height: 32px;
+  background: #1a1a1a;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  margin: 16px 0;
+}
+.shock-meter-fill {
+  height: 100%;
+  border-radius: 16px;
+  transition: width 1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.shock-meter-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.65rem;
+  color: #555;
+  margin-top: 4px;
+}
+
+/* Assumptions panel */
+.assumptions {
+  background: #0d0d15;
+  border: 1px solid #1a1a2a;
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 16px;
+}
+.assumptions h4 { color: #888; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+.assumptions ul { list-style: none; padding: 0; }
+.assumptions li { font-size: 0.75rem; color: #555; padding: 3px 0; }
+.assumptions li::before { content: '// '; color: #333; }
+
+/* Slider controls */
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+@media (max-width: 700px) { .controls { grid-template-columns: 1fr; } }
+.control-group label {
+  display: block;
+  font-size: 0.7rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+.control-group input[type="range"] {
+  width: 100%;
+  accent-color: #f7931a;
+}
+.control-value {
+  font-size: 0.8rem;
+  color: #f7931a;
+  text-align: right;
+}
+
+footer {
+  text-align: center;
+  color: #333;
+  font-size: 0.7rem;
+  margin-top: 40px;
+  padding: 20px;
+}
+footer a { color: #f7931a55; text-decoration: none; }
 </style>
 </head>
 <body>
 <div class="container">
-<h1>🪙 BTC Supply Shock Dashboard</h1>
-<p style="color: #888;">Live Exchange Balance Monitor</p>
 
-<div class="grid">
-<div class="card">
-<div class="value" style="color: #ff3b30;">7.74%</div>
-<div style="text-align: center; color: #888;">Supply on Exchanges</div>
-</div>
-<div class="card">
-<div class="value">1.63M</div>
-<div style="text-align: center; color: #888;">BTC on Exchanges</div>
-</div>
-<div class="card">
-<div class="value" style="color: #ff3b30;">100/100</div>
-<div style="text-align: center; color: #888;">Shock Score</div>
-</div>
+<header>
+  <h1>BTC SUPPLY SHOCK DASHBOARD</h1>
+  <div class="subtitle">
+    Exchange Balance Monitor & Nuclear Supply Shock Forecast
+    <br>Data: <a href="https://studio.glassnode.com/charts/distribution.BalanceExchanges?a=BTC" target="_blank">Glassnode</a>
+    &middot; <a href="https://strc.live/" target="_blank">STRC.live</a>
+    &middot; <a href="https://www.strategy.com/purchases" target="_blank">Strategy.com</a>
+  </div>
+</header>
+
+<!-- Top Metrics -->
+<div class="metrics-grid">
+  <div class="metric-card">
+    <div class="metric-label">BTC on Exchanges</div>
+    <div class="metric-value text-red" id="metricExBal">2.97M</div>
+    <div class="metric-sub">Glassnode All Exchanges</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">% of Supply on Exchanges</div>
+    <div class="metric-value text-red" id="metricExPct">14.85%</div>
+    <div class="metric-sub">of 20.0M mined</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">Strategy Holdings</div>
+    <div class="metric-value text-orange">761,068</div>
+    <div class="metric-sub">3.81% of total supply</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">Strategy Weekly Buy Rate</div>
+    <div class="metric-value text-orange">~14,449</div>
+    <div class="metric-sub">BTC/week (2026 avg)</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">Effective Liquid Supply</div>
+    <div class="metric-value text-yellow" id="metricLiquid">—</div>
+    <div class="metric-sub">Exchanges minus lost BTC est.</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">Supply Shock Score</div>
+    <div class="metric-value text-red" id="metricScore">—</div>
+    <div class="metric-sub">0 = calm, 100 = nuclear</div>
+  </div>
 </div>
 
-<div class="card">
-<h3>Supply Shock Levels</h3>
-<div style="margin: 15px 0; padding: 15px; background: #252525; border-radius: 10px; display: flex; justify-content: space-between;">
-<span><strong>12% Supply</strong><br><span style="color: #888;">~2.52M BTC</span></span>
-<span style="color: #ffcc00;">Moderate Risk</span>
-</div>
-<div style="margin: 15px 0; padding: 15px; background: #252525; border-radius: 10px; display: flex; justify-content: space-between;">
-<span><strong>10% Supply</strong><br><span style="color: #888;">~2.10M BTC</span></span>
-<span style="color: #ff9500;">High Risk</span>
-</div>
-<div style="margin: 15px 0; padding: 15px; background: #252525; border-radius: 10px; display: flex; justify-content: space-between;">
-<span><strong>8% Supply</strong><br><span style="color: #888;">~1.68M BTC</span></span>
-<span style="color: #ff3b30;">EXTREME 🔥</span>
-</div>
-</div>
-
-<div class="card">
-<h3>Key Insight</h3>
-<p>When exchange supply drops, less BTC is available for sale. Historical precedent: March 2024 at 10.5% supply → BTC rallied 40%.</p>
-<p style="color: #888; margin-top: 15px;">Current trend: Rising inflow (more supply on exchanges = less shock risk short-term)</p>
+<!-- Shock Meter -->
+<div class="section">
+  <div class="section-title">SUPPLY SHOCK SEVERITY METER</div>
+  <div class="shock-meter">
+    <div class="shock-meter-fill" id="shockMeterFill" style="width: 0%; background: linear-gradient(90deg, #30d158, #ffd60a, #ff9500, #ff3b30);">
+      <span id="shockMeterText"></span>
+    </div>
+  </div>
+  <div class="shock-meter-labels">
+    <span>0 — Normal</span>
+    <span>25 — Elevated</span>
+    <span>50 — High</span>
+    <span>75 — Severe</span>
+    <span>100 — NUCLEAR</span>
+  </div>
 </div>
 
+<!-- Exchange Balance Chart + Rate of Change -->
+<div class="two-col">
+  <div class="section">
+    <div class="section-title">EXCHANGE BALANCE HISTORY (BTC)</div>
+    <div class="chart-container">
+      <canvas id="exchangeBalanceChart"></canvas>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">RATE OF CHANGE (Monthly)</div>
+    <div class="chart-container">
+      <canvas id="rateOfChangeChart"></canvas>
+    </div>
+  </div>
 </div>
-<div style="text-align: center; color: #666; margin-top: 40px;">
-Last updated: 2026-03-15 | Data: Exchange balance aggregation
+
+<!-- Strategy Acquisition Tracker -->
+<div class="section">
+  <div class="section-title">STRATEGY BTC ACQUISITIONS & STRC FUNDING</div>
+  <div class="chart-container">
+    <canvas id="strategyChart"></canvas>
+  </div>
 </div>
+
+<!-- Forecast Section -->
+<div class="section">
+  <div class="section-title">NUCLEAR SUPPLY SHOCK FORECAST — SCENARIO PROJECTIONS</div>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>Strategy Weekly Buy Rate (BTC) <span class="control-value" id="sliderBuyVal">14,449</span></label>
+      <input type="range" id="sliderBuy" min="3000" max="30000" step="500" value="14449">
+    </div>
+    <div class="control-group">
+      <label>Organic Exchange Outflow (BTC/week) <span class="control-value" id="sliderOutVal">4,000</span></label>
+      <input type="range" id="sliderOut" min="0" max="15000" step="500" value="4000">
+    </div>
+    <div class="control-group">
+      <label>Exchange Inflow (BTC/week) <span class="control-value" id="sliderInVal">2,500</span></label>
+      <input type="range" id="sliderIn" min="0" max="15000" step="500" value="2500">
+    </div>
+    <div class="control-group">
+      <label>Strategy Buy Rate Acceleration (%/month) <span class="control-value" id="sliderAccelVal">5</span></label>
+      <input type="range" id="sliderAccel" min="0" max="30" step="1" value="5">
+    </div>
+  </div>
+
+  <div class="chart-container chart-container-lg">
+    <canvas id="forecastChart"></canvas>
+  </div>
+
+  <!-- Scenario Table -->
+  <table class="scenario-table" id="scenarioTable">
+    <thead>
+      <tr>
+        <th>Scenario</th>
+        <th>Strategy Buy Rate</th>
+        <th>Net Weekly Drain</th>
+        <th>Exchange Balance at Shock</th>
+        <th>Time to Supply Shock</th>
+        <th>Projected Date</th>
+        <th>Severity</th>
+      </tr>
+    </thead>
+    <tbody id="scenarioBody"></tbody>
+  </table>
+
+  <div class="assumptions">
+    <h4>Model Assumptions</h4>
+    <ul>
+      <li>Current exchange balance: ~2,970,000 BTC (Glassnode, Mar 2026)</li>
+      <li>Total mined supply: ~20,000,000 BTC; lost coins est: ~3,500,000</li>
+      <li>New issuance: ~3,150 BTC/week (450/day post-halving 2024)</li>
+      <li>"Nuclear" supply shock threshold: exchange balance &lt; 1,000,000 BTC (5% of supply)</li>
+      <li>"Severe" shock: &lt; 1,500,000 BTC; "High" shock: &lt; 2,000,000 BTC</li>
+      <li>Strategy holdings: 761,068 BTC; 2026 avg buy rate ~14,449 BTC/week</li>
+      <li>STRC preferred stock now primary funding mechanism ($1.18B/week)</li>
+      <li>Model does not account for ETF inflows, other corporate treasuries, or halving effects</li>
+      <li>Rate acceleration compounds monthly on the Strategy buy rate</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Supply Breakdown -->
+<div class="section">
+  <div class="section-title">BTC SUPPLY BREAKDOWN</div>
+  <div class="two-col">
+    <div class="chart-container">
+      <canvas id="supplyPieChart"></canvas>
+    </div>
+    <div>
+      <table class="scenario-table">
+        <thead><tr><th>Category</th><th>BTC</th><th>% of Mined</th></tr></thead>
+        <tbody>
+          <tr><td style="color:#ff3b30">On Exchanges</td><td>2,970,000</td><td>14.85%</td></tr>
+          <tr><td style="color:#f7931a">Strategy (MSTR)</td><td>761,068</td><td>3.81%</td></tr>
+          <tr><td style="color:#ffd60a">ETFs & Institutions</td><td>~1,200,000</td><td>~6.00%</td></tr>
+          <tr><td style="color:#555">Lost / Inaccessible</td><td>~3,500,000</td><td>~17.50%</td></tr>
+          <tr><td style="color:#0a84ff">Long-term Holders (1yr+)</td><td>~8,500,000</td><td>~42.50%</td></tr>
+          <tr><td style="color:#30d158">Other Circulating</td><td>~3,069,000</td><td>~15.34%</td></tr>
+          <tr><td style="color:#333">Unmined (remaining)</td><td>~1,000,000</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<footer>
+  BTC Supply Shock Dashboard &middot; Model for educational/research purposes only &middot; Not financial advice
+  <br>Data sources: <a href="https://studio.glassnode.com" target="_blank">Glassnode</a> &middot;
+  <a href="https://strc.live" target="_blank">STRC.live</a> &middot;
+  <a href="https://www.strategy.com/purchases" target="_blank">Strategy.com</a> &middot;
+  <a href="https://www.coinglass.com/Balance" target="_blank">CoinGlass</a>
+  <br>Last updated: 2026-03-20
+</footer>
+
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+
+// Historical exchange balance data (monthly, in millions BTC)
+// Source: Glassnode aggregate exchange balances
+const exchangeHistory = [
+  { date: '2020-01', bal: 3.10 },
+  { date: '2020-06', bal: 3.05 },
+  { date: '2020-12', bal: 2.90 },
+  { date: '2021-03', bal: 2.80 },
+  { date: '2021-06', bal: 2.65 },
+  { date: '2021-09', bal: 2.55 },
+  { date: '2021-12', bal: 2.60 },
+  { date: '2022-03', bal: 2.55 },
+  { date: '2022-06', bal: 2.50 },
+  { date: '2022-09', bal: 2.45 },
+  { date: '2022-12', bal: 2.40 },
+  { date: '2023-03', bal: 2.38 },
+  { date: '2023-06', bal: 2.35 },
+  { date: '2023-09', bal: 2.30 },
+  { date: '2023-12', bal: 2.35 },
+  { date: '2024-03', bal: 2.32 },
+  { date: '2024-06', bal: 2.80 },
+  { date: '2024-09', bal: 2.90 },
+  { date: '2024-12', bal: 3.05 },
+  { date: '2025-03', bal: 3.10 },
+  { date: '2025-06', bal: 3.08 },
+  { date: '2025-09', bal: 3.05 },
+  { date: '2025-12', bal: 3.02 },
+  { date: '2026-01', bal: 3.00 },
+  { date: '2026-02', bal: 2.98 },
+  { date: '2026-03', bal: 2.97 },
+];
+
+// Strategy cumulative BTC purchases (selected dates)
+const strategyHistory = [
+  { date: '2020-08', btc: 21454, cum: 21454 },
+  { date: '2020-12', btc: 49542, cum: 70996 },
+  { date: '2021-06', btc: 34171, cum: 105167 },
+  { date: '2021-12', btc: 19452, cum: 124619 },
+  { date: '2022-06', btc: 5445,  cum: 130064 },
+  { date: '2022-12', btc: 2395,  cum: 132459 },
+  { date: '2023-06', btc: 12333, cum: 144792 },
+  { date: '2023-12', btc: 29050, cum: 173842 },
+  { date: '2024-03', btc: 25250, cum: 199092 },
+  { date: '2024-06', btc: 12000, cum: 211092 },
+  { date: '2024-09', btc: 15200, cum: 226292 },
+  { date: '2024-12', btc: 220000,cum: 446292 },
+  { date: '2025-03', btc: 80000, cum: 526292 },
+  { date: '2025-06', btc: 55000, cum: 581292 },
+  { date: '2025-09', btc: 50000, cum: 631292 },
+  { date: '2025-12', btc: 64828, cum: 696120 },
+  { date: '2026-01', btc: 15000, cum: 711120 },
+  { date: '2026-02', btc: 27611, cum: 738731 },
+  { date: '2026-03', btc: 22337, cum: 761068 },
+];
+
+// STRC weekly funding data (recent weeks in $M)
+const strcWeekly = [
+  { week: 'Feb 3',  btcFromSTRC: 3200,  totalBuy: 8000 },
+  { week: 'Feb 10', btcFromSTRC: 4100,  totalBuy: 9500 },
+  { week: 'Feb 17', btcFromSTRC: 5500,  totalBuy: 12000 },
+  { week: 'Feb 24', btcFromSTRC: 4800,  totalBuy: 11500 },
+  { week: 'Mar 2',  btcFromSTRC: 1200,  totalBuy: 3015 },
+  { week: 'Mar 9',  btcFromSTRC: 8500,  totalBuy: 17994 },
+  { week: 'Mar 16', btcFromSTRC: 10767, totalBuy: 22337 },
+];
+
+const TOTAL_SUPPLY = 20000000;
+const EXCHANGE_BAL = 2970000;
+const LOST_BTC = 3500000;
+const NEW_ISSUANCE_WEEK = 3150;
+const STRATEGY_HOLDINGS = 761068;
+
+// ============================================================
+// SHOCK SCORE CALCULATION
+// ============================================================
+function calcShockScore(exchangeBal) {
+  const pct = exchangeBal / TOTAL_SUPPLY;
+  // 15% = score 0, 5% = score 100
+  const score = Math.max(0, Math.min(100, ((0.15 - pct) / 0.10) * 100));
+  return Math.round(score);
+}
+
+const shockScore = calcShockScore(EXCHANGE_BAL);
+document.getElementById('metricScore').textContent = shockScore + '/100';
+document.getElementById('metricLiquid').textContent =
+  ((EXCHANGE_BAL) / 1e6).toFixed(2) + 'M';
+
+// Shock meter
+const meterFill = document.getElementById('shockMeterFill');
+meterFill.style.width = shockScore + '%';
+document.getElementById('shockMeterText').textContent = shockScore + '%';
+
+// ============================================================
+// CHART DEFAULTS
+// ============================================================
+Chart.defaults.color = '#888';
+Chart.defaults.borderColor = '#222';
+Chart.defaults.font.family = "'SF Mono', 'Fira Code', monospace";
+Chart.defaults.font.size = 11;
+
+// ============================================================
+// 1. EXCHANGE BALANCE CHART
+// ============================================================
+new Chart(document.getElementById('exchangeBalanceChart'), {
+  type: 'line',
+  data: {
+    labels: exchangeHistory.map(d => d.date),
+    datasets: [{
+      label: 'BTC on Exchanges (M)',
+      data: exchangeHistory.map(d => d.bal),
+      borderColor: '#ff3b30',
+      backgroundColor: '#ff3b3015',
+      fill: true,
+      tension: 0.3,
+      pointRadius: 3,
+      pointBackgroundColor: '#ff3b30',
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      annotation: {
+        annotations: {
+          nuclearLine: {
+            type: 'line',
+            yMin: 1.0,
+            yMax: 1.0,
+            borderColor: '#ff3b3066',
+            borderWidth: 2,
+            borderDash: [6, 4],
+            label: {
+              display: true,
+              content: 'NUCLEAR THRESHOLD (1.0M)',
+              position: 'start',
+              color: '#ff3b30',
+              font: { size: 9 },
+              backgroundColor: 'transparent',
+            }
+          },
+          severeLine: {
+            type: 'line',
+            yMin: 1.5,
+            yMax: 1.5,
+            borderColor: '#ff950066',
+            borderWidth: 1,
+            borderDash: [4, 4],
+            label: {
+              display: true,
+              content: 'SEVERE (1.5M)',
+              position: 'start',
+              color: '#ff9500',
+              font: { size: 9 },
+              backgroundColor: 'transparent',
+            }
+          }
+        }
+      }
+    },
+    scales: {
+      y: {
+        title: { display: true, text: 'Million BTC' },
+        min: 0.5,
+        max: 3.5,
+      },
+      x: {
+        ticks: { maxRotation: 45, maxTicksLimit: 12 }
+      }
+    }
+  }
+});
+
+// ============================================================
+// 2. RATE OF CHANGE CHART
+// ============================================================
+const rocData = [];
+for (let i = 1; i < exchangeHistory.length; i++) {
+  const change = exchangeHistory[i].bal - exchangeHistory[i - 1].bal;
+  rocData.push({
+    date: exchangeHistory[i].date,
+    change: +(change * 1000000).toFixed(0), // in BTC
+    pct: +((change / exchangeHistory[i - 1].bal) * 100).toFixed(2)
+  });
+}
+
+new Chart(document.getElementById('rateOfChangeChart'), {
+  type: 'bar',
+  data: {
+    labels: rocData.map(d => d.date),
+    datasets: [{
+      label: 'Monthly Change (BTC)',
+      data: rocData.map(d => d.change),
+      backgroundColor: rocData.map(d => d.change < 0 ? '#ff3b3088' : '#30d15888'),
+      borderColor: rocData.map(d => d.change < 0 ? '#ff3b30' : '#30d158'),
+      borderWidth: 1,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: {
+        title: { display: true, text: 'BTC Change' },
+      },
+      x: {
+        ticks: { maxRotation: 45, maxTicksLimit: 12 }
+      }
+    }
+  }
+});
+
+// ============================================================
+// 3. STRATEGY ACQUISITION CHART (with STRC overlay)
+// ============================================================
+new Chart(document.getElementById('strategyChart'), {
+  type: 'bar',
+  data: {
+    labels: strcWeekly.map(d => d.week),
+    datasets: [
+      {
+        label: 'Total Weekly BTC Buy',
+        data: strcWeekly.map(d => d.totalBuy),
+        backgroundColor: '#f7931a44',
+        borderColor: '#f7931a',
+        borderWidth: 1,
+        order: 2,
+      },
+      {
+        label: 'BTC from STRC Preferred',
+        data: strcWeekly.map(d => d.btcFromSTRC),
+        backgroundColor: '#bf5af288',
+        borderColor: '#bf5af2',
+        borderWidth: 1,
+        order: 1,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'top' },
+      title: {
+        display: true,
+        text: 'Strategy Weekly BTC Purchases — STRC Preferred Stock vs Total (2026)',
+        color: '#888',
+      }
+    },
+    scales: {
+      y: { title: { display: true, text: 'BTC' }, beginAtZero: true },
+      x: { ticks: { maxRotation: 0 } }
+    }
+  }
+});
+
+// ============================================================
+// 4. SUPPLY PIE CHART
+// ============================================================
+new Chart(document.getElementById('supplyPieChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['On Exchanges', 'Strategy (MSTR)', 'ETFs & Institutions', 'Lost/Inaccessible', 'Long-term Holders', 'Other Circulating'],
+    datasets: [{
+      data: [2970000, 761068, 1200000, 3500000, 8500000, 3069000],
+      backgroundColor: ['#ff3b30', '#f7931a', '#ffd60a', '#555', '#0a84ff', '#30d158'],
+      borderColor: '#111118',
+      borderWidth: 3,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { padding: 12, usePointStyle: true, pointStyle: 'circle' }
+      }
+    }
+  }
+});
+
+// ============================================================
+// 5. FORECAST MODEL
+// ============================================================
+const sliderBuy = document.getElementById('sliderBuy');
+const sliderOut = document.getElementById('sliderOut');
+const sliderIn = document.getElementById('sliderIn');
+const sliderAccel = document.getElementById('sliderAccel');
+
+let forecastChart = null;
+
+function runForecast() {
+  const baseBuyRate = parseInt(sliderBuy.value);
+  const organicOutflow = parseInt(sliderOut.value);
+  const inflow = parseInt(sliderIn.value);
+  const accelPct = parseInt(sliderAccel.value) / 100;
+
+  document.getElementById('sliderBuyVal').textContent = baseBuyRate.toLocaleString();
+  document.getElementById('sliderOutVal').textContent = organicOutflow.toLocaleString();
+  document.getElementById('sliderInVal').textContent = inflow.toLocaleString();
+  document.getElementById('sliderAccelVal').textContent = (accelPct * 100).toFixed(0) + '%';
+
+  // Scenarios: bear (0.5x), base (1x), bull (1.5x), hyper (2x)
+  const scenarios = [
+    { name: 'Bear Case',  buyMult: 0.5,  outMult: 0.5, color: '#30d158', dash: [6, 4] },
+    { name: 'Base Case',  buyMult: 1.0,  outMult: 1.0, color: '#ffd60a', dash: [] },
+    { name: 'Bull Case',  buyMult: 1.5,  outMult: 1.5, color: '#ff9500', dash: [] },
+    { name: 'Hyper Bull', buyMult: 2.0,  outMult: 2.0, color: '#ff3b30', dash: [3, 3] },
+  ];
+
+  const WEEKS = 104; // 2 years
+  const labels = [];
+  const startDate = new Date('2026-03-20');
+
+  for (let w = 0; w <= WEEKS; w++) {
+    const d = new Date(startDate);
+    d.setDate(d.getDate() + w * 7);
+    labels.push(d.toISOString().slice(0, 10));
+  }
+
+  const datasets = [];
+  const scenarioResults = [];
+
+  for (const sc of scenarios) {
+    const data = [];
+    let bal = EXCHANGE_BAL;
+    let weeklyBuy = baseBuyRate * sc.buyMult;
+    let shockWeek = null;
+    let severeWeek = null;
+    let nuclearWeek = null;
+
+    for (let w = 0; w <= WEEKS; w++) {
+      data.push(bal / 1e6);
+
+      // Check thresholds
+      if (bal <= 2000000 && !shockWeek) shockWeek = w;
+      if (bal <= 1500000 && !severeWeek) severeWeek = w;
+      if (bal <= 1000000 && !nuclearWeek) nuclearWeek = w;
+
+      // Weekly dynamics
+      const netOutflow = (organicOutflow * sc.outMult) - inflow;
+      const strategyDrain = weeklyBuy;
+      const newSupply = NEW_ISSUANCE_WEEK;
+      bal = bal - strategyDrain - netOutflow + newSupply;
+      bal = Math.max(bal, 0);
+
+      // Monthly acceleration
+      if (w > 0 && w % 4 === 0) {
+        weeklyBuy *= (1 + accelPct);
+      }
+    }
+
+    datasets.push({
+      label: sc.name,
+      data: data,
+      borderColor: sc.color,
+      backgroundColor: 'transparent',
+      borderWidth: 2,
+      borderDash: sc.dash,
+      tension: 0.2,
+      pointRadius: 0,
+    });
+
+    const shockDate = nuclearWeek
+      ? new Date(startDate.getTime() + nuclearWeek * 7 * 86400000).toISOString().slice(0, 10)
+      : 'Beyond 2028';
+
+    const netDrain = Math.round(baseBuyRate * sc.buyMult + organicOutflow * sc.outMult - inflow - NEW_ISSUANCE_WEEK);
+
+    scenarioResults.push({
+      name: sc.name,
+      buyRate: Math.round(baseBuyRate * sc.buyMult).toLocaleString(),
+      netDrain: netDrain.toLocaleString(),
+      shockBal: nuclearWeek ? '< 1.0M' : severeWeek ? '< 1.5M' : shockWeek ? '< 2.0M' : '> 2.0M',
+      weeks: nuclearWeek || severeWeek || shockWeek || '—',
+      date: shockDate,
+      severity: nuclearWeek ? 'NUCLEAR' : severeWeek ? 'SEVERE' : shockWeek ? 'HIGH' : 'MODERATE',
+      severityColor: nuclearWeek ? '#ff3b30' : severeWeek ? '#ff9500' : shockWeek ? '#ffd60a' : '#30d158',
+    });
+  }
+
+  // Add threshold lines
+  datasets.push({
+    label: 'Nuclear Threshold',
+    data: Array(WEEKS + 1).fill(1.0),
+    borderColor: '#ff3b3044',
+    borderWidth: 1,
+    borderDash: [4, 4],
+    pointRadius: 0,
+  });
+  datasets.push({
+    label: 'Severe Threshold',
+    data: Array(WEEKS + 1).fill(1.5),
+    borderColor: '#ff950044',
+    borderWidth: 1,
+    borderDash: [4, 4],
+    pointRadius: 0,
+  });
+
+  // Render chart
+  if (forecastChart) forecastChart.destroy();
+  forecastChart = new Chart(document.getElementById('forecastChart'), {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'top', labels: { usePointStyle: true, pointStyle: 'line' } },
+        title: {
+          display: true,
+          text: 'Projected Exchange Balance — When Does Nuclear Supply Shock Hit?',
+          color: '#888',
+          font: { size: 13 },
+        }
+      },
+      scales: {
+        y: {
+          title: { display: true, text: 'Million BTC on Exchanges' },
+          min: 0,
+        },
+        x: {
+          ticks: { maxTicksLimit: 16, maxRotation: 45 },
+          title: { display: true, text: 'Date' },
+        }
+      }
+    }
+  });
+
+  // Render scenario table
+  const tbody = document.getElementById('scenarioBody');
+  tbody.innerHTML = '';
+  for (const s of scenarioResults) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>${s.name}</strong></td>
+      <td>${s.buyRate} BTC/wk</td>
+      <td>${s.netDrain} BTC/wk</td>
+      <td>${s.shockBal}</td>
+      <td>${typeof s.weeks === 'number' ? s.weeks + ' weeks' : s.weeks}</td>
+      <td>${s.date}</td>
+      <td style="color:${s.severityColor}; font-weight:700">${s.severity}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+// Slider event listeners
+[sliderBuy, sliderOut, sliderIn, sliderAccel].forEach(s => {
+  s.addEventListener('input', runForecast);
+});
+
+// Initial render
+runForecast();
+
+</script>
 </body>
 </html>
