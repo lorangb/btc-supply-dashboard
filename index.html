@@ -55,12 +55,17 @@ h1 { background: linear-gradient(90deg, #f7931a, #ff9500, #f7931a); -webkit-back
 .badge-ok { background: #34c75922; color: #34c759; border: 1px solid #34c75955; }
 .badge-warn { background: #ff950022; color: #ff9500; border: 1px solid #ff950055; }
 .badge-stale { background: #ff3b3022; color: #ff3b30; border: 1px solid #ff3b3055; }
+.badge-info { background: #5ac8fa22; color: #5ac8fa; border: 1px solid #5ac8fa55; }
 .data-source { color: #555; font-size: 0.75rem; margin-top: 2px; }
 .valid-icon { font-size: 0.9rem; }
 .check-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #1a1a1a; font-size: 0.85rem; }
 .check-row:last-child { border-bottom: none; }
 .check-row .metric { color: #aaa; }
 .check-row .status { font-weight: 600; }
+
+/* Methodology note */
+.meth-note { background: linear-gradient(135deg, #1a1a2e, #0d0d1a); border: 1px solid #5ac8fa33; padding: 16px; border-radius: 12px; margin: 15px 0; font-size: 0.85rem; color: #aaa; }
+.meth-note strong { color: #fff; }
 
 /* Forecast section */
 .forecast-card { background: linear-gradient(135deg, #1a1a2e, #0d0d1a); border: 1px solid #f7931a33; }
@@ -110,9 +115,17 @@ h1 { background: linear-gradient(90deg, #f7931a, #ff9500, #f7931a); -webkit-back
 <div class="card validation-panel" style="border-color: #f7931a55;">
   <h3>🔍 Data Validation</h3>
   <p style="color:#888; font-size:0.85rem; margin-bottom:12px;">
-    Every metric checked against live sources. <strong style="color:#34c759;">✓ Verified</strong> · <span style="color:#ff9500;">⚠ Near-live</span> · <span style="color:#ff3b30;">✗ Stale</span>
+    Every metric checked against live sources. <strong style="color:#34c759;">✓ Verified</strong> · <span style="color:#ff9500;">⚠ Near-live</span> · <span style="color:#5ac8fa;">ⓘ Computed</span>
   </p>
   <div id="validationChecks"></div>
+</div>
+
+<!-- ═══ METHODOLOGY NOTE ═══ -->
+<div class="meth-note">
+  <strong style="color:#5ac8fa;">ⓘ Methodology</strong> — All exchange supply data from a SINGLE source (CryptoQuant "All Exchanges" Reserve) for internal consistency.
+  <strong>Supply % = BTC on Exchanges / Circulating Supply × 100.</strong>
+  Current: 2.74M BTC ÷ 20.05M circ = <strong style="color:#ff9500;">13.7%</strong>.
+  <br><span style="color:#555;">Santiment reports a narrower 5.6% (tracked hot-wallet subset). Both show declining trend; difference is wallet-label coverage (Santiment = narrower set, CryptoQuant = includes cold storage).</span>
 </div>
 
 <!-- ═══ KEY METRICS ═══ -->
@@ -124,15 +137,16 @@ h1 { background: linear-gradient(90deg, #f7931a, #ff9500, #f7931a); -webkit-back
     <div class="label">ATH: $126,080 (Oct 6, 2025) · <span style="color:#ff3b30;">−49% from ATH</span></div>
   </div>
   <div class="card">
-    <h3>Supply on Exchanges <span style="font-weight:400;color:#555;font-size:0.7rem;">Santiment</span></h3>
-    <div class="value red">5.6%</div>
-    <div class="change down">▼ −2.1% since Mar 2026</div>
-    <div class="label">Tracked wallets · ~1.12M BTC · Lowest since 2018</div>
+    <h3>Supply on Exchanges <span style="font-weight:400;color:#555;font-size:0.7rem;">CryptoQuant</span></h3>
+    <div class="value orange">13.7%</div>
+    <div class="change down">▼ −2.3pp since Jan 2026 (16.0%)</div>
+    <div class="label">2.74M BTC / 20.05M circ · Broad CEX (hot + cold) · Near 5-yr lows</div>
   </div>
   <div class="card">
-    <h3>BTC on Exchanges <span style="font-weight:400;color:#555;font-size:0.7rem;">CryptoQuant</span></h3>
-    <div class="value orange">2.74M</div>
-    <div class="label">Broad exchange balance (~13.7% of circ supply)</div>
+    <h3>Liquid Supply <span style="font-weight:400;color:#555;font-size:0.7rem;">Santiment</span></h3>
+    <div class="value red">5.6%</div>
+    <div class="change down">▼ −2.1pp since Mar 2026 (7.7%)</div>
+    <div class="label">Narrower tracked subs<e> (hot wallets) · ~1.12M BTC · Lowest since 2018</e></div>
   </div>
   <div class="card">
     <h3>Circulating Supply</h3>
@@ -144,40 +158,39 @@ h1 { background: linear-gradient(90deg, #f7931a, #ff9500, #f7931a); -webkit-back
 <div class="grid">
   <div class="card">
     <h3>Supply Shock Score</h3>
-    <div class="value red">92 / 100</div>
-    <div class="shock-meter"><div class="shock-fill" style="width: 92%;"></div></div>
+    <div class="value orange">72 / 100</div>
+    <div class="shock-meter"><div class="shock-fill" style="width: 72%;"></div></div>
     <div class="shock-label">
       <span>Low (0)</span>
-      <span class="shock-badge shock-extreme">EXTREME 🔥</span>
+      <span class="shock-badge shock-high">HIGH 🔥</span>
       <span>High (100)</span>
     </div>
-    <div class="label" style="margin-top: 10px;">Exchange supply at generational lows · ~$63.4B stablecoin buying power ready</div>
+    <div class="label" style="margin-top: 10px;">Exchange supply at ~13.7% — tight for broad CEX measure. ~$63.4B stablecoin buying power on sidelines.</div>
   </div>
   <div class="card">
     <h3>Market Context</h3>
     <div class="data-row"><span class="key">ATH</span><span class="val">$126,080 (Oct 2025)</span></div>
     <div class="data-row"><span class="key">Current / ATH</span><span class="val" style="color:#ff3b30;">−49%</span></div>
     <div class="data-row"><span class="key">Stablecoin Exchange Reserves</span><span class="val" style="color:#34c759;">$63.4B</span></div>
-    <div class="data-row"><span class="key">Total Stablecoin Mkt Cap</span><span class="val" style="color:#5ac8fa;">$306B</span></div>
-    <div class="data-row"><span class="key">USDT Supply</span><span class="val">$186.5B</span></div>
-    <div class="data-row"><span class="key">USDC Supply</span><span class="val">$76.5B</span></div>
+    <div class="data-row"><span class="key">Total Stablecoin Mkt Cap</span><span class="val" style="color:#5ac8fa;">~$306B</span></div>
     <div class="data-row"><span class="key">Market Cap</span><span class="val">$1.28T</span></div>
     <div class="data-row"><span class="key">Exchange Trend</span><span class="val" style="color:#ff9500;">Slight uptick (profit-taking near $63K)</span></div>
-    <div class="data-row"><span class="key">Supply Shock Thesis</span><span class="val" style="color:#34c759;">Intact</span></div>
+    <div class="data-row"><span class="key">Supply Shock Thesis</span><span class="val" style="color:#34c759;">Intact (declining trend)</span></div>
+    <div class="data-row"><span class="key">Liquid Supply (Santiment)</span><span class="val" style="color:#ff3b30;">5.6% — multi-yr low</span></div>
     <div class="data-row"><span class="key">30d Price Change</span><span class="val" style="color:#ff3b30;">−17.7%</span></div>
   </div>
 </div>
 
 <!-- ═══ SUPPLY SHOCK FORECAST ═══ -->
 <div class="card forecast-card" id="forecastCard">
-  <h3>🔮 Supply Shock Forecast <span style="font-weight:400;color:#555;font-size:0.7rem;">Log-linear trend projection</span></h3>
+  <h3>🔮 Supply Shock Forecast <span style="font-weight:400;color:#555;font-size:0.7rem;">CryptoQuant % · Linear projection</span></h3>
   <p style="color:#888; font-size:0.85rem; margin: 8px 0 4px;">
-    Based on historical exchange supply % (2020–2026) from Santiment. 
-    Bull case = 2× historical decline rate (accelerating accumulation). 
-    Bear case = 0.5× rate (slowing accumulation).
+    Based on CryptoQuant monthly exchange supply % data (Jan–Jun 2026). Short-horizon projection (~12 months). 
+    Bull = 2× trend (acceleration from ETF/self-custody). Bear = 0.5× trend (profit-taking slows outflows).
+    <span style="color:#ff9500;">⚠ 6-month data → high uncertainty. Recalculate monthly.</span>
   </p>
   <div class="legend-row">
-    <span><span class="legend-dot historical"></span>Historical (actual)</span>
+    <span><span class="legend-dot historical"></span>Base (historical trend)</span>
     <span><span class="legend-dot bull"></span>Bull 🟢</span>
     <span><span class="legend-dot bear"></span>Bear 🟠</span>
   </div>
@@ -188,98 +201,93 @@ h1 { background: linear-gradient(90deg, #f7931a, #ff9500, #f7931a); -webkit-back
     </div>
   </div>
   <div style="color:#444; font-size:0.8rem; margin-top:10px;">
-    <strong style="color:#f7931a;">Model:</strong> Log-linear regression on monthly Santiment data (2020–2026). R² = <span id="rSquared">—</span>. 
-    Current decline rate: <span id="declineRate">—</span> percentage points/yr.
+    <strong style="color:#f7931a;">Model:</strong> Linear regression on 6 monthly CryptoQuant % data points (Jan–Jun 2026). 
+    Monthly decline rate: <span id="declineRate">—</span>. R² = <span id="rSquared">—</span>.
+    Forecast horizon 12 months → recalculate next month.
   </div>
 </div>
 
 <!-- ═══ SUPPLY SHOCK THRESHOLDS ═══ -->
 <div class="card">
-  <h3>Supply Shock Thresholds</h3>
+  <h3>Supply Shock Thresholds <span style="font-weight:400;color:#555;font-size:0.7rem;">CryptoQuant methodology</span></h3>
   <div class="supply-bar">
-    <div><span class="level">12% Supply</span><br><span class="value-label">~2.40M BTC</span></div>
-    <span class="risk low">🟢 Passed (Jan 2024)</span>
+    <div><span class="level">16% Supply</span><br><span class="value-label">~3.21M BTC</span></div>
+    <span class="risk low">🟢 Past (Jan 2026 level)</span>
+  </div>
+  <div class="supply-bar">
+    <div><span class="level">14% Supply</span><br><span class="value-label">~2.81M BTC</span></div>
+    <span class="risk moderate">🟡 Past (Apr 2026)</span>
+  </div>
+  <div class="supply-bar">
+    <div><span class="level">12% Supply</span><br><span class="value-label">~2.41M BTC</span></div>
+    <span class="risk high">🟠 Past (May 2026 ATL)</span>
   </div>
   <div class="supply-bar">
     <div><span class="level">10% Supply</span><br><span class="value-label">~2.00M BTC</span></div>
-    <span class="risk moderate">🟡 Passed (Mid 2024)</span>
+    <span class="risk extreme">🔴 Next Major Threshold</span>
   </div>
   <div class="supply-bar">
     <div><span class="level">8% Supply</span><br><span class="value-label">~1.60M BTC</span></div>
-    <span class="risk high">🟠 Passed (Early 2025)</span>
-  </div>
-  <div class="supply-bar">
-    <div><span class="level">6% Supply</span><br><span class="value-label">~1.20M BTC</span></div>
-    <span class="risk extreme">🔴 REACHED (Jun 2026) ← CURRENT</span>
-  </div>
-  <div class="supply-bar">
-    <div><span class="level">5% Supply</span><br><span class="value-label">~1.00M BTC</span></div>
-    <span class="risk extreme">🔴 Next Threshold</span>
-  </div>
-  <div class="supply-bar">
-    <div><span class="level">4% Supply</span><br><span class="value-label">~0.80M BTC</span></div>
     <span class="risk extreme">🔴 Ultra Supply Shock</span>
   </div>
   <div class="supply-bar">
-    <div><span class="level">3% Supply</span><br><span class="value-label">~0.60M BTC</span></div>
-    <span class="risk extreme">🔴 Near-Zero Exchange Supply</span>
+    <div><span class="level">Santiment: 5.6%</span><br><span class="value-label">Liquid supply subset</span></div>
+    <span class="risk extreme">🔴 EXTREME (by narrower measure)</span>
   </div>
   <div style="color:#444; font-size:0.85rem; margin-top:10px;">
-    Current exchange supply of <strong style="color:#ff3b30;">5.6%</strong> is below the EXTREME threshold — historically unprecedented supply crunch. See forecast above for when next thresholds may be breached.
+    Current CryptoQuant (broad) supply: <strong style="color:#ff9500;">13.7%</strong>. 
+    Santiment (liquid) subset: <strong style="color:#ff3b30;">5.6%</strong> — extreme by the narrower hot-wallet measure.
+    ~$63.4B in stablecoin reserves ready to deploy.
   </div>
 </div>
 
 <!-- ═══ EXCHANGE SUPPLY TREND CHART ═══ -->
 <div class="card">
-  <h3>Exchange Supply Trend</h3>
+  <h3>Exchange Supply Trend <span style="font-weight:400;color:#555;font-size:0.7rem;">CryptoQuant (consistent methodology)</span></h3>
   <div class="chart-container">
     <canvas id="supplyChart"></canvas>
   </div>
   <div style="color:#444; font-size:0.85rem; margin-top:10px; text-align:center;">
-    Monthly exchange BTC balance (CryptoQuant) · Supply % (Santiment)
+    Monthly data: BTC on exchanges (CryptoQuant All Exchanges) · % computed from circulating supply
   </div>
 </div>
 
-<!-- ═══ HISTORICAL DATA TABLE ═══ -->
+<!-- ═══ MONTHLY DATA TABLE ═══ -->
 <div class="card">
-  <h3>📅 Historical Exchange Supply % (Santiment)</h3>
-  <p style="color:#555; font-size:0.8rem; margin-bottom:10px;">Annual milestones used for forecast regression</p>
-  <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap:8px;">
-    <div class="data-row"><span class="key">2020 (Mar)</span><span class="val" style="color:#ff3b30;">16.0%</span></div>
-    <div class="data-row"><span class="key">2020 (Dec)</span><span class="val">14.0%</span></div>
-    <div class="data-row"><span class="key">2021 (Jun)</span><span class="val">13.0%</span></div>
-    <div class="data-row"><span class="key">2021 (Dec)</span><span class="val">12.0%</span></div>
-    <div class="data-row"><span class="key">2022 (Jun)</span><span class="val">12.0%</span></div>
-    <div class="data-row"><span class="key">2022 (Dec)</span><span class="val">11.2%</span></div>
-    <div class="data-row"><span class="key">2023 (Jun)</span><span class="val">11.7%</span></div>
-    <div class="data-row"><span class="key">2023 (Dec)</span><span class="val">11.0%</span></div>
-    <div class="data-row"><span class="key">2024 (Mar)</span><span class="val">10.5%</span></div>
-    <div class="data-row"><span class="key">2024 (Jun)</span><span class="val">10.0%</span></div>
-    <div class="data-row"><span class="key">2024 (Sep)</span><span class="val">9.5%</span></div>
-    <div class="data-row"><span class="key">2024 (Dec)</span><span class="val">9.0%</span></div>
-    <div class="data-row"><span class="key">2025 (Mar)</span><span class="val">7.7%</span></div>
-    <div class="data-row"><span class="key">2025 (Jun)</span><span class="val">7.2%</span></div>
-    <div class="data-row"><span class="key">2025 (Sep)</span><span class="val">6.8%</span></div>
-    <div class="data-row"><span class="key">2025 (Dec)</span><span class="val">6.5%</span></div>
-    <div class="data-row"><span class="key">2026 (Mar)</span><span class="val" style="color:#ff9500;">7.7% ⚠ profit-taking</span></div>
-    <div class="data-row"><span class="key">2026 (Jun)</span><span class="val" style="color:#ff3b30;font-weight:700;">5.6% ← CURRENT</span></div>
+  <h3>📅 2026 Monthly Data (CryptoQuant — All Exchanges)</h3>
+  <p style="color:#555; font-size:0.8rem; margin-bottom:10px;">Internally consistent: % = BTC on Exchanges / Circulating Supply</p>
+  <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap:8px;">
+    <div class="data-row"><span class="key">Jan 2026</span><span class="val">3.20M BTC = <strong style="color:#ff9500;">16.0%</strong></span></div>
+    <div class="data-row"><span class="key">Feb 2026</span><span class="val">3.05M BTC = <strong style="color:#ff9500;">15.2%</strong></span></div>
+    <div class="data-row"><span class="key">Mar 2026</span><span class="val">2.90M BTC = <strong style="color:#ff9500;">14.5%</strong></span></div>
+    <div class="data-row"><span class="key">Apr 2026</span><span class="val">2.78M BTC = <strong style="color:#ff9500;">13.9%</strong></span></div>
+    <div class="data-row"><span class="key">May 2026</span><span class="val">2.56M BTC = <strong style="color:#34c759;">12.8%</strong> <span style="color:#555;">(2026 ATL)</span></span></div>
+    <div class="data-row"><span class="key">Jun 2026</span><span class="val">2.74M BTC = <strong style="color:#ff3b30;font-weight:700;">13.7%</strong> ← CURRENT</span></div>
+  </div>
+  <div style="margin-top:12px; padding-top:12px; border-top:1px solid #222;">
+    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap:4px; font-size:0.8rem;">
+      <span style="color:#555;">Sources:</span>
+      <span style="color:#888;">CryptoQuant (all-exchanges reserve + monthly snapshots)</span>
+      <span style="color:#888;">CoinGecko (price, circulating supply live)</span>
+      <span style="color:#888;">Santiment (liquid subset reference: 5.6%)</span>
+    </div>
   </div>
 </div>
 
 <!-- ═══ KEY INSIGHT ═══ -->
 <div class="card insight-box">
   <h3 style="color:#f7931a;">⚡ Key Insight</h3>
-  <p>Exchange supply has collapsed from <strong>7.7% (Mar 2026)</strong> to <strong>5.6% (Jun 2026)</strong> — the lowest level since 2018. Every 1% of supply removed from exchanges represents ~200K BTC that cannot be easily sold.</p>
-  <p style="margin-top: 12px; color: #888;">Historical precedent: March 2024 at 10.5% supply on exchanges → BTC rallied 40% in 60 days. Current levels are <strong style="color:#ff3b30;">nearly half that</strong>.</p>
+  <p>Broad exchange supply (CryptoQuant) has declined from <strong>16.0% (Jan 2026)</strong> to <strong>13.7% (Jun 2026)</strong> — a net <strong>−2.3pp reduction</strong> despite a profit-taking uptick from 12.8% in May. The trend is clearly down.</p>
+  <p style="margin-top: 12px; color: #888;">The narrower Santiment measure (5.6%) reflects the <strong style="color:#ff3b30;">liquid hot-wallet layer only</strong> — the BTC that can actually be traded immediately. By that measure, available sell-side liquidity is at generational lows.</p>
   <p style="margin-top: 12px; color: #aaa;">⚠️ Recent slight inflows observed — possible profit-taking near $63K. But ~$63.4B in stablecoin reserves on exchanges provides massive buying power for the next leg up.</p>
   <p style="margin-top: 12px; color: #f7931a;">
-    🔮 <strong>Forecast:</strong> At current decline rate, <span id="forecastSummary" style="font-weight:700;"></span>
+    🔮 <strong>Short-term forecast:</strong> <span id="forecastSummary" style="font-weight:700;"></span>
   </p>
 </div>
 
 <div class="footer">
   <span>Last updated:</span> 2026-06-20 21:00 UTC &nbsp;·&nbsp; 
-  Coingecko (live price) · Santiment (exchange supply %) · CryptoQuant (exchange reserves) · Glassnode (historical) &nbsp;·&nbsp; 
+  CryptoQuant (exchange reserves) · CoinGecko (price, circ supply) · Santiment (liquid subset reference) &nbsp;·&nbsp; 
   <span>BTC Supply Shock Dashboard</span>
 </div>
 
@@ -291,18 +299,17 @@ h1 { background: linear-gradient(90deg, #f7931a, #ff9500, #f7931a); -webkit-back
 // ═══════════════════════════════════════════════════════════════
 
 const VALIDATION_CHECKS = [
-  { metric: 'BTC Price',         value: '$63,863',  source: 'CoinGecko API',       age: 'live',   status: '✓ Live', cls: 'badge-ok' },
-  { metric: '24h Change',        value: '+1.24%',   source: 'CoinGecko API',       age: 'live',   status: '✓ Live', cls: 'badge-ok' },
-  { metric: '7d Change',         value: '-0.6%',    source: 'CoinGecko API',       age: 'live',   status: '✓ Live', cls: 'badge-ok' },
-  { metric: 'Circulating Supply',value: '20.05M',   source: 'CoinGecko API',       age: 'live',   status: '✓ Live', cls: 'badge-ok' },
-  { metric: 'ATH',               value: '$126,080', source: 'CoinGecko API',       age: 'live',   status: '✓ Live', cls: 'badge-ok' },
-  { metric: 'Exchange Supply %', value: '5.6%',     source: 'Santiment (X post)',  age: '1-2d',   status: '⚠ Near-live', cls: 'badge-warn' },
-  { metric: 'BTC on Exchanges',  value: '2.74M',    source: 'CryptoQuant (X post)',age: '1-2d',   status: '⚠ Near-live', cls: 'badge-warn' },
-  { metric: 'Stablecoin Reserves',value: '$63.4B',  source: 'CryptoQuant (X post)',age: '1-2d',   status: '⚠ Near-live', cls: 'badge-warn' },
-  { metric: 'Market Cap',        value: '$1.28T',   source: 'CoinGecko API',       age: 'live',   status: '✓ Live', cls: 'badge-ok' },
-  { metric: 'ATH Date',          value: 'Oct 6, 2025',source: 'CoinGecko API',    age: 'static', status: '✓ Known', cls: 'badge-ok' },
-  { metric: 'USDT Supply',       value: '$186.5B',  source: 'X on-chain data',    age: '1-3d',   status: '⚠ Near-live', cls: 'badge-warn' },
-  { metric: 'USDC Supply',       value: '$76.5B',   source: 'X on-chain data',    age: '1-3d',   status: '⚠ Near-live', cls: 'badge-warn' },
+  { metric: 'BTC Price',         value: '$63,863',  source: 'CoinGecko API',        age: 'live',   status: '✓ Live', cls: 'badge-ok' },
+  { metric: '24h Change',        value: '+1.24%',   source: 'CoinGecko API',        age: 'live',   status: '✓ Live', cls: 'badge-ok' },
+  { metric: 'Circulating Supply',value: '20.05M',   source: 'CoinGecko API',        age: 'live',   status: '✓ Live', cls: 'badge-ok' },
+  { metric: 'ATH',               value: '$126,080', source: 'CoinGecko API',        age: 'live',   status: '✓ Live', cls: 'badge-ok' },
+  { metric: 'Supply % (CQ)',     value: '13.7%',    source: 'Computed: 2.74M/20.05M',age: 'computed',status: 'ⓘ Derived', cls: 'badge-info' },
+  { metric: 'BTC on Exchanges',  value: '2.74M',    source: 'CryptoQuant (X post)', age: '1-2d',   status: '⚠ Near-live', cls: 'badge-warn' },
+  { metric: 'Liquid Supply (SN)',value: '5.6%',     source: 'Santiment (X post)',   age: '1-2d',   status: '⚠ Narrower set', cls: 'badge-warn' },
+  { metric: 'Stablecoin Reserves',value: '$63.4B',  source: 'CryptoQuant (X post)', age: '1-2d',   status: '⚠ Near-live', cls: 'badge-warn' },
+  { metric: 'Market Cap',        value: '$1.28T',   source: 'CoinGecko API',        age: 'live',   status: '✓ Live', cls: 'badge-ok' },
+  { metric: 'ATH Date',          value: 'Oct 6, 2025',source: 'CoinGecko API',     age: 'static', status: '✓ Known', cls: 'badge-ok' },
+  { metric: 'Monthly Data (CQ)', value: 'Jan-Jun 2026',source: 'CryptoQuant',      age: '1-2d',   status: '✓ Consistent', cls: 'badge-ok' },
 ];
 
 function renderValidation() {
@@ -315,76 +322,47 @@ function renderValidation() {
     </div>
   `).join('');
   el.innerHTML += `<div style="text-align:right;color:#555;font-size:0.75rem;margin-top:8px;">
-    All live data fetched ${new Date().toISOString().slice(0,19).replace('T',' ')} UTC via CoinGecko REST API · X data via xAI/X search
+    All live data fetched ${new Date().toISOString().slice(0,19).replace('T',' ')} UTC via CoinGecko REST API · CryptoQuant data via X search · Supply % computed internally for consistency
   </div>`;
 }
 renderValidation();
 
 // ═══════════════════════════════════════════════════════════════
-// 2.  SUPPLY SHOCK FORECAST MODEL (Log-linear regression)
+// 2.  SUPPLY SHOCK FORECAST — CryptoQuant % only (6 months)
 // ═══════════════════════════════════════════════════════════════
 
-// Monthly Santiment exchange supply % data (2020-01 to 2026-06)
-// Monthly resolution for accurate regression
-const HISTORICAL = [
-  // Year, month (1-indexed), supply %
-  { y:2020, m:1,  pct:16.0 },
-  { y:2020, m:3,  pct:16.0 },
-  { y:2020, m:6,  pct:15.5 },
-  { y:2020, m:9,  pct:14.8 },
-  { y:2020, m:12, pct:14.0 },
-  { y:2021, m:3,  pct:14.5 },
-  { y:2021, m:6,  pct:13.0 },
-  { y:2021, m:9,  pct:12.5 },
-  { y:2021, m:12, pct:12.0 },
-  { y:2022, m:3,  pct:12.5 },
-  { y:2022, m:6,  pct:12.0 },
-  { y:2022, m:9,  pct:11.5 },
-  { y:2022, m:12, pct:11.2 },
-  { y:2023, m:3,  pct:11.5 },
-  { y:2023, m:6,  pct:11.7 },
-  { y:2023, m:9,  pct:11.5 },
-  { y:2023, m:12, pct:11.0 },
-  { y:2024, m:1,  pct:11.8 },
-  { y:2024, m:3,  pct:10.5 },
-  { y:2024, m:6,  pct:10.0 },
-  { y:2024, m:9,  pct:9.5  },
-  { y:2024, m:12, pct:9.0  },
-  { y:2025, m:1,  pct:8.5  },
-  { y:2025, m:3,  pct:7.7  },
-  { y:2025, m:6,  pct:7.2  },
-  { y:2025, m:9,  pct:6.8  },
-  { y:2025, m:12, pct:6.5  },
-  { y:2026, m:1,  pct:6.3  },
-  { y:2026, m:2,  pct:6.0  },
-  { y:2026, m:3,  pct:7.7  }, // profit-taking spike
-  { y:2026, m:4,  pct:6.8  },
-  { y:2026, m:5,  pct:5.9  },
-  { y:2026, m:6,  pct:5.6  },
+// CryptoQuant-computed monthly exchange supply %:
+// % = BTC_on_exchanges / circulating_supply * 100
+// All data from CryptoQuant "All Exchanges" Reserve
+const MONTHLY_CQ = [
+  // { year, month (1-indexed), btc_millions, circ_millions, pct }
+  { y:2026, m:1, btc:3.20, circ:20.00, pct:16.0 },
+  { y:2026, m:2, btc:3.05, circ:20.02, pct:15.2 },
+  { y:2026, m:3, btc:2.90, circ:20.03, pct:14.5 },
+  { y:2026, m:4, btc:2.78, circ:20.04, pct:13.9 },
+  { y:2026, m:5, btc:2.56, circ:20.04, pct:12.8 },
+  { y:2026, m:6, btc:2.74, circ:20.05, pct:13.7 },
 ];
 
-// Convert to months since epoch (2020-01-15 as t=0)
-function monthsSinceEpoch(y, m) {
-  return (y - 2020) * 12 + (m - 1);
+// Linear regression: pct ~ months_since_jan2026
+function monthsFromStart(y, m) {
+  return (y - 2026) * 12 + (m - 1);
 }
 
-// Log-linear regression: ln(pct) ~ t
-// We exclude the March 2026 profit-taking spike for the regression
-const REGRESSION_POINTS = HISTORICAL.filter(d => !(d.y===2026 && d.m===3));
+const pts = MONTHLY_CQ.map(d => ({
+  x: monthsFromStart(d.y, d.m),
+  y: d.pct,
+  btc: d.btc,
+  circ: d.circ,
+}));
 
-const n = REGRESSION_POINTS.length;
+const n = pts.length;
 let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
-const pts = REGRESSION_POINTS.map(d => {
-  const x = monthsSinceEpoch(d.y, d.m);
-  const y = Math.log(d.pct);
-  return { x, y, pct: d.pct };
-});
 pts.forEach(({x,y}) => { sumX += x; sumY += y; sumXY += x*y; sumX2 += x*x; });
 
 const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
 const intercept = (sumY - slope * sumX) / n;
 
-// R-squared
 const yMean = sumY / n;
 let ssRes = 0, ssTot = 0;
 pts.forEach(({x,y}) => {
@@ -396,26 +374,25 @@ const rSquared = 1 - ssRes / ssTot;
 
 document.getElementById('rSquared').textContent = rSquared.toFixed(3);
 
-// Current month index and current predicted %
-const currentMonth = monthsSinceEpoch(2026, 6);
-const currentPred = Math.exp(slope * currentMonth + intercept);
-const annualSlopePct = (Math.exp(slope * 12) - 1) * 100; // annualized decline %
+// Monthly decline in percentage points
+const monthlyDeclinePP = Math.abs(slope);
+document.getElementById('declineRate').textContent = monthlyDeclinePP.toFixed(2) + ' pp/mo (' + (monthlyDeclinePP * 12).toFixed(1) + ' pp/yr)';
 
-document.getElementById('declineRate').innerHTML = 
-  `${annualSlopePct.toFixed(1)}% (exponential) ≈ ${(Math.exp(slope*12+intercept)-Math.exp(intercept)).toFixed(1)} pp/yr`;
+const currentMonth = monthsFromStart(2026, 6);
+const currentPct = MONTHLY_CQ.find(d => d.y===2026 && d.m===6).pct;
 
-// Project forward for bull, base, bear cases
-function forecastDate(thresholdPct, multiplier) {
-  // ln(threshold) = slope * multiplier * t + intercept
-  // t = (ln(threshold) - intercept) / (slope * multiplier)
-  const monthsFromNow = (Math.log(thresholdPct) - (slope * currentMonth + intercept)) 
-                        / (slope * multiplier);
-  if (monthsFromNow <= 0) return null; // already passed
+function forecastDatePct(targetPct, multiplier) {
+  // target = slope * multiplier * t + intercept
+  // t = (target - intercept) / (slope * multiplier)
+  const actualSlope = slope * multiplier;
+  const monthsFromNow = (targetPct - (slope * currentMonth + intercept)) / actualSlope;
+  if (monthsFromNow <= 0) return null;
   
   const totalMonths = currentMonth + monthsFromNow;
-  const year = 2020 + Math.floor(totalMonths / 12);
-  const month = Math.floor(totalMonths % 12) + 1;
-  return { year, month, monthsFromNow };
+  const year = 2026 + Math.floor(totalMonths / 12);
+  const month = Math.floor(totalMonths % 12);
+  // month 0 = Jan, adjust to 1-indexed
+  return { year, month: month + 1, monthsFromNow };
 }
 
 function fmtDate(d) {
@@ -424,7 +401,7 @@ function fmtDate(d) {
   return `${months[d.month-1]} ${d.year}`;
 }
 
-const THRESHOLDS = [5.0, 4.5, 4.0, 3.5, 3.0, 2.5, 2.0];
+const THRESHOLDS = [12.0, 10.0, 8.0, 6.0];
 const SCENARIOS = [
   { label: 'Bull 🟢', mult: 2.0, cls: 'bull' },
   { label: 'Base',    mult: 1.0, cls: 'blended' },
@@ -436,30 +413,26 @@ function renderForecast() {
   let html = '';
   
   THRESHOLDS.forEach(pct => {
-    const current = 5.6;
-    const passed = pct >= current;
-    const pctStr = pct.toFixed(1);
+    const passed = pct >= currentPct;
     
     html += `<div class="forecast-item">
       <div class="forecast-threshold ${passed ? 'passed' : ''}">
-        ${pctStr}%
+        ${pct}%
         <span style="font-size:0.7rem;color:#555;display:block;font-weight:400;">
           ~${(20.045 * pct / 100).toFixed(2)}M BTC
         </span>
       </div>
       <div class="forecast-bar-wrap">`;
     
-    // Show each scenario
     SCENARIOS.forEach(sc => {
-      const fd = forecastDate(pct, sc.mult);
-      const dateStr = passed ? '✓ Reached' : (fd ? fmtDate(fd) : '—');
-      const pctFromNow = ((5.6 - pct) / 5.6 * 100);
+      const fd = forecastDatePct(pct, sc.mult);
+      const dateStr = passed ? '✓ Past' : (fd ? fmtDate(fd) : '—');
       
       if (passed) {
-        html += `<div class="forecast-date" style="color:#666;font-size:0.8rem;">✓ Already below ${pctStr}%</div>`;
+        html += `<div class="forecast-date" style="color:#666;font-size:0.8rem;">✓ Already below ${pct}%</div>`;
       } else if (fd) {
-        const maxMonths = forecastDate(2.0, 0.5).monthsFromNow; // furthest point for scaling
-        const barWidth = Math.min(100, (fd.monthsFromNow / maxMonths) * 100);
+        // Width proportional to months
+        const barWidth = Math.min(100, (fd.monthsFromNow / 18) * 100);
         html += `<div style="display:flex;align-items:center;gap:10px;">
           <div style="flex:1;height:6px;border-radius:3px;background:#1a1a1a;position:relative;">
             <div class="forecast-bar-fill ${sc.cls}" style="width:${barWidth}%;"></div>
@@ -477,28 +450,23 @@ function renderForecast() {
   
   el.innerHTML = html;
   
-  // Update forecast summary in insight box
-  const nextBull = forecastDate(5.0, 2.0);
-  const nextBase = forecastDate(5.0, 1.0);
-  const nextBear = forecastDate(5.0, 0.5);
+  // Summary for insight box
+  const nextBase = forecastDatePct(10.0, 1.0);
+  const nextBull = forecastDatePct(10.0, 2.0);
   let summary = '';
-  if (nextBull) summary += `5% threshold may be reached by <strong style="color:#34c759;">${fmtDate(nextBull)}</strong> (bull)`;
-  else summary += `5% threshold: already reached`;
+  if (nextBull) summary += `10% broad supply by <strong style="color:#34c759;">${fmtDate(nextBull)}</strong> (bull)`;
   if (nextBase) summary += ` · <strong style="color:#f7931a;">${fmtDate(nextBase)}</strong> (base)`;
-  if (nextBear) summary += ` · <strong style="color:#ff9500;">${fmtDate(nextBear)}</strong> (bear)`;
+  if (!nextBase) summary += `10% threshold: not projected within forecast horizon`;
   
-  const next4Base = forecastDate(4.0, 1.0);
-  if (next4Base) summary += `<br>4% supply shock (ultra): ~<strong style="color:#ff3b30;">${fmtDate(next4Base)}</strong> at base rate`;
-  
-  const next3Base = forecastDate(3.0, 1.0);
-  if (next3Base) summary += ` · near-zero (3%): ~<strong style="color:#ff3b30;">${fmtDate(next3Base)}</strong>`;
+  // Also add Santiment note
+  summary += `<br>Liquid (Santiment) subset at 5.6% — already extreme.`;
   
   document.getElementById('forecastSummary').innerHTML = summary;
 }
 renderForecast();
 
 // ═══════════════════════════════════════════════════════════════
-// 3.  FORECAST CHART (actual + projected)
+// 3.  FORECAST CHART
 // ═══════════════════════════════════════════════════════════════
 
 function buildForecastChart() {
@@ -508,31 +476,28 @@ function buildForecastChart() {
   const baseLine = [];
   const bearLine = [];
   
-  // Historical data (2020-2026)
-  HISTORICAL.forEach(d => {
-    const t = monthsSinceEpoch(d.y, d.m);
-    const mn = monthsSinceEpoch(2020, 1);
-    const offset = t - mn;
-    labels.push(`${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.m-1]} '${String(d.y).slice(2)}`);
-    actualPct.push(d.pct);
+  // Historical: Jan-Jun 2026
+  const months = ['Jan','Feb','Mar','Apr','May','Jun'];
+  const histPct = [16.0, 15.2, 14.5, 13.9, 12.8, 13.7];
+  
+  months.forEach((m, i) => {
+    labels.push(`${m} '26`);
+    actualPct.push(histPct[i]);
     bullLine.push(null);
     baseLine.push(null);
     bearLine.push(null);
   });
   
-  // Future projections (2026-2030)
-  const currentIdx = monthsSinceEpoch(2026, 6);
-  for (let m = 1; m <= 54; m++) {
-    const t = currentIdx + m;
-    const mn = monthsSinceEpoch(2020, 1);
-    const offset = labels.length;
-    const yr = 2020 + Math.floor(t / 12);
-    const mo = t % 12;
+  // Project forward: Jul 2026 → Jun 2027 (12 months)
+  for (let m = 1; m <= 12; m++) {
+    const t = currentMonth + m;
+    const mo = (t % 12);
+    const yr = 2026 + Math.floor(t / 12);
     labels.push(`${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][mo]} '${String(yr).slice(2)}`);
     actualPct.push(null);
-    bullLine.push(Math.exp(slope * 2.0 * t + intercept - slope * 2.0 * currentIdx + Math.log(5.6)));
-    baseLine.push(Math.exp(slope * t + intercept));
-    bearLine.push(Math.exp(slope * 0.5 * t + intercept - slope * 0.5 * currentIdx + Math.log(5.6)));
+    bullLine.push(slope * 2.0 * t + intercept - 2.0 * slope * currentMonth + currentPct);
+    baseLine.push(slope * t + intercept);
+    bearLine.push(slope * 0.5 * t + intercept - 0.5 * slope * currentMonth + currentPct);
   }
   
   const ctx = document.getElementById('forecastChart').getContext('2d');
@@ -542,12 +507,12 @@ function buildForecastChart() {
       labels: labels,
       datasets: [
         {
-          label: 'Historical (Santiment)',
+          label: 'Historical (CryptoQuant)',
           data: actualPct,
           borderColor: '#f7931a',
-          backgroundColor: 'rgba(247,147,26,0.08)',
+          backgroundColor: 'rgba(247,147,26,0.12)',
           pointBackgroundColor: '#f7931a',
-          pointRadius: 3,
+          pointRadius: 5,
           borderWidth: 3,
           fill: false,
           tension: 0.2,
@@ -600,13 +565,13 @@ function buildForecastChart() {
       },
       scales: {
         x: {
-          ticks: { color: '#666', maxTicksLimit: 20 },
+          ticks: { color: '#666', maxTicksLimit: 15 },
           grid: { color: '#222' }
         },
         y: {
-          title: { display: true, text: '% of Supply on Exchanges', color: '#666' },
-          min: 0,
-          max: 18,
+          title: { display: true, text: '% on Exchanges (CryptoQuant)', color: '#666' },
+          min: 8,
+          max: 17,
           ticks: { color: '#666', callback: v => v + '%' },
           grid: { color: '#222' }
         }
@@ -617,7 +582,7 @@ function buildForecastChart() {
 buildForecastChart();
 
 // ═══════════════════════════════════════════════════════════════
-// 4.  EXCHANGE SUPPLY CHART (existing dual-axis)
+// 4.  EXCHANGE SUPPLY CHART (dual-axis, CryptoQuant only)
 // ═══════════════════════════════════════════════════════════════
 
 const ctx2 = document.getElementById('supplyChart').getContext('2d');
@@ -626,7 +591,7 @@ new Chart(ctx2, {
   data: {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
     datasets: [{
-      label: 'BTC on Exchanges (M)',
+      label: 'BTC on Exchanges (M) — CryptoQuant',
       data: [3.20, 3.05, 2.90, 2.78, 2.56, 2.74],
       borderColor: '#ff3b30',
       backgroundColor: 'rgba(255,59,48,0.08)',
@@ -635,8 +600,8 @@ new Chart(ctx2, {
       pointBackgroundColor: '#ff3b30',
       pointRadius: 4,
     }, {
-      label: 'Exchange Supply %',
-      data: [8.1, 7.9, 7.7, 6.8, 5.9, 5.6],
+      label: 'Exchange Supply % (computed)',
+      data: [16.0, 15.2, 14.5, 13.9, 12.8, 13.7],
       borderColor: '#f7931a',
       backgroundColor: 'rgba(247,147,26,0.08)',
       fill: true,
@@ -660,12 +625,16 @@ new Chart(ctx2, {
       y: {
         position: 'left',
         title: { display: true, text: 'BTC (Millions)', color: '#666' },
+        min: 2.3,
+        max: 3.5,
         ticks: { color: '#666', callback: v => v + 'M' },
         grid: { color: '#222' }
       },
       y1: {
         position: 'right',
         title: { display: true, text: '% of Supply', color: '#666' },
+        min: 11,
+        max: 17,
         ticks: { color: '#666', callback: v => v + '%' },
         grid: { display: false }
       }
